@@ -76,8 +76,8 @@ namespace ICSharpCode.WpfDesign.Designer.Controls
 			};
 			ToolTip = "Edit the Text. Press" + Environment.NewLine + "Enter to make changes." + Environment.NewLine + "Shift+Enter to insert a newline." + Environment.NewLine + "Esc to cancel editing.";
 
-			editor.TextChanged += editor_TextChanged;
 			FormatedTextEditor.SetRichTextBoxTextFromTextBlock(editor, ((TextBlock)designItem.Component));
+			editor.TextChanged += editor_TextChanged;
 		}
 
 		void editor_TextChanged(object sender, TextChangedEventArgs e)
@@ -95,7 +95,7 @@ namespace ICSharpCode.WpfDesign.Designer.Controls
 		{
 			if (changeGroup != null && _isChangeGroupOpen)
 			{
-				changeGroup.Abort();
+				changeGroup.Commit();
 				_isChangeGroupOpen = false;
 			}
 			base.OnLostKeyboardFocus(e);
@@ -143,7 +143,8 @@ namespace ICSharpCode.WpfDesign.Designer.Controls
 			}
 			else if (e.Key == Key.Enter)
 			{
-				editor.Selection.Text += Environment.NewLine;
+                // TODO：？，不注释会生成两行
+				//editor.Selection.Text += Environment.NewLine;
 			}
 		}
 

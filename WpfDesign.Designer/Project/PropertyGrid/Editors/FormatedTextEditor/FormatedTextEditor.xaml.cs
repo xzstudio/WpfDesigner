@@ -194,26 +194,34 @@ namespace ICSharpCode.WpfDesign.Designer.PropertyGrid.Editors.FormatedTextEditor
 			return d;
 		}
 
-		public static void SetTextBlockTextFromRichTextBlox(DesignItem designItem, RichTextBox richTextBox)
-		{
-			designItem.Properties.GetProperty(TextBlock.TextProperty).Reset();
+	    public static void SetTextBlockTextFromRichTextBlox(DesignItem designItem, RichTextBox richTextBox)
+	    {
+	        var doc = richTextBox.Document;
 
-			var inlinesProperty = designItem.Properties.GetProperty("Inlines");
-			inlinesProperty.CollectionElements.Clear();
+	        var docLines = doc.Blocks.OfType<Paragraph>().SelectMany(p => p.Inlines).ToArray();
+	        if (docLines.Length == 0) {
+	            designItem.Properties.GetProperty(TextBlock.TextProperty).Reset();
+	        }
+	        else if (docLines.Length == 1) {
+	            var text = docLines.First() as Run;
+	            designItem.Properties.GetProperty(TextBlock.TextProperty).SetValue(text?.Text);
+	        }
+	        else {
+	            designItem.Properties.GetProperty(TextBlock.TextProperty).Reset();
 
-			var doc = richTextBox.Document;
-			//richTextBox.Document = new FlowDocument();
+	            var inlinesProperty = designItem.Properties.GetProperty("Inlines");
+	            inlinesProperty.CollectionElements.Clear();
 
-			var inlines = new List<DesignItem>();
-			GetDesignItems(designItem, doc.Blocks, inlines);
+	            var inlines = new List<DesignItem>();
+	            GetDesignItems(designItem, doc.Blocks, inlines);
 
-			foreach (var inline in inlines)
-			{
-				inlinesProperty.CollectionElements.Add(inline);
-			}
-		}
+	            foreach (var inline in inlines) {
+	                inlinesProperty.CollectionElements.Add(inline);
+	            }
+	        }
+	    }
 
-		private void Ok_Click(object sender, RoutedEventArgs e)
+	    private void Ok_Click(object sender, RoutedEventArgs e)
 		{
 			var changeGroup = designItem.OpenGroup("Formated Text");
 
